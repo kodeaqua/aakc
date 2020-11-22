@@ -62,6 +62,7 @@ function buildKernel() {
 	make $(cat $KHOME/.settings | grep device: | cut -d ' ' -f 2)_defconfig;
 	
 	echo "[x] Compiling...";
+	start=$(date +"%s");
 	if [[ $(cat $KHOME/.settings | grep ccache: | cut -d ' ' -f 2) == Y && $(cat $KHOME/.settings | grep ccache: | cut -d ' ' -f 2) == y ]]; then
 		make CC="ccache $BIN" OUT=$ANYKERNEL -j$(nproc --all);
 	else
@@ -75,7 +76,11 @@ function buildKernel() {
 	fi;
 	if ! [[ -f $KHOME/$ARCH/boot/*Image* ]]; then
 		echo "[x] Failed to compile kernel!";
-	fi
+	fi;
+
+	finish=$(date +"%s");
+	timediff=$(($finish - $start));
+	echo "[x] Build took $((timediff / 60)) minute(s) and $((timediff % 60)) seconds!";
 }
 
 cd $KHOME;
