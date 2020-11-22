@@ -56,17 +56,17 @@ function buildKernel() {
 	
 	if [[ -f $KHOME/.config ]]; then
 		echo "[x] Cleaning old config and codes...";
-		make clean && make mrproper;
+		make clean &>buildlog.txt; make mrproper &>>buildlog.txt;
 	fi
 	echo "[x] Generating config...";
-	make $(cat $KHOME/.settings | grep device: | cut -d ' ' -f 2)_defconfig;
+	make $(cat $KHOME/.settings | grep device: | cut -d ' ' -f 2)_defconfig &>>buildlog.txt;
 	
 	echo "[x] Compiling...";
 	start=$(date +"%s");
 	if [[ $(cat $KHOME/.settings | grep ccache: | cut -d ' ' -f 2) == Y && $(cat $KHOME/.settings | grep ccache: | cut -d ' ' -f 2) == y ]]; then
-		make CC="ccache $BIN" OUT=$ANYKERNEL -j$(nproc --all);
+		make CC="ccache $BIN" OUT=$ANYKERNEL -j$(nproc --all) &>>buildlog.txt;
 	else
-		make OUT=$ANYKERNEL -j$(nproc --all);
+		make OUT=$ANYKERNEL -j$(nproc --all) &>>buildlog.txt;
 	fi;
 
 	if [[ -f $KHOME/$ARCH/boot/*Image* ]]; then
