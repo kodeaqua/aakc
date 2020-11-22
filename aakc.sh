@@ -27,7 +27,13 @@ function buildKernel() {
 	local SUBARCH=$(cat $KHOME/.settings | grep sub: | cut -d ' ' -f 2);
 	local KBUILD_BUILD_USER=$USER;
 	local KBUILD_BUILD_HOST=$(cat /etc/hostname);
+	
 	local CROSS_COMPILE="$(cat $KHOME/.settings | grep toolchain: | cut -d ' ' -f 2)-";
+	if [[ $(echo $CROSS_COMPILE | grep clang) ]]; then
+		local BIN="clang";
+	else
+		local BIN="gcc";
+	fi
 
 	local ANYKERNEL=$KHOME/AnyKernel3;
 	if ! [[ -d $ANYKERNEL ]]; then
@@ -57,7 +63,7 @@ function buildKernel() {
 	
 	echo "[x] Compiling...";
 	if [[ $(cat $KHOME/.settings | grep ccache: | cut -d ' ' -f 2) == Y && $(cat $KHOME/.settings | grep ccache: | cut -d ' ' -f 2) == y ]]; then
-		make CC="ccache gcc" OUT=$ANYKERNEL -j$(nproc --all);
+		make CC="ccache $BIN" OUT=$ANYKERNEL -j$(nproc --all);
 	else
 		make OUT=$ANYKERNEL -j$(nproc --all);
 	fi;
